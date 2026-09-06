@@ -1,0 +1,439 @@
+/* PyQuest — mobile first. Everything is sized for a thumb on a phone that is
+   running this from the home screen, where there is no browser chrome and no
+   back button of its own. */
+
+:root {
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --surface-2: #f0f0f6;
+  --border: #e2e2ec;
+  --text: #1a1a24;
+  --text-dim: #63637a;
+  --accent: #5b4bdb;
+  --accent-soft: #ece9ff;
+  --ok: #1a7f4b;
+  --ok-soft: #e3f6ec;
+  --bad: #c4283c;
+  --bad-soft: #fdeaed;
+  --code-bg: #1e1e2e;
+  --code-text: #e6e6f0;
+  --radius: 14px;
+  --tap: 44px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12111a;
+    --surface: #1c1b27;
+    --surface-2: #262536;
+    --border: #33324a;
+    --text: #ececf4;
+    --text-dim: #9a9ab5;
+    --accent: #9b8cff;
+    --accent-soft: #2a2545;
+    --ok: #5ddb9a;
+    --ok-soft: #12331f;
+    --bad: #ff8095;
+    --bad-soft: #3a1a22;
+    --code-bg: #0f0f18;
+    --code-text: #e6e6f0;
+  }
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* The browser's own [hidden] rule loses to any class or id that sets display,
+   which would leave the key toolbar and the not-yet-earned Next button on
+   screen. Restate it so `el.hidden = true` always means hidden. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overscroll-behavior-y: none;
+}
+
+body { padding-top: env(safe-area-inset-top); }
+
+#app { min-height: 100vh; }
+
+/* ---------------------------------------------------------------- top bar */
+
+#topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+#topbar-title {
+  font-weight: 650;
+  font-size: 17px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#topbar-stats { display: flex; gap: 6px; flex-shrink: 0; }
+
+.chip {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  margin: calc((var(--tap) - 30px) / -2) 0;
+  margin-left: -12px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 30px;
+  line-height: 1;
+  padding: 0 6px;
+  cursor: pointer;
+}
+
+/* ----------------------------------------------------------------- screen */
+
+main {
+  padding: 16px 14px calc(28px + env(safe-area-inset-bottom));
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+h1 { font-size: 25px; margin: 4px 0 6px; letter-spacing: -0.02em; }
+h2 { font-size: 19px; margin: 0 0 8px; letter-spacing: -0.01em; }
+p { margin: 0 0 12px; }
+.dim { color: var(--text-dim); }
+.small { font-size: 14px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* Long code and tables scroll inside their own box, never the page. */
+pre, .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 12px 0;
+  font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  tab-size: 4;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+pre code { background: none; padding: 0; font-size: inherit; }
+
+.out-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  margin: 10px 0 4px;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+button {
+  font: inherit;
+  font-weight: 600;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:active { transform: scale(0.985); }
+.btn[disabled] { opacity: 0.45; }
+
+.btn.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn.ghost { background: none; color: var(--accent); }
+
+.btn-row { display: flex; gap: 10px; margin-top: 12px; }
+.btn-row .btn { flex: 1; }
+
+/* ------------------------------------------------------------ level cards */
+
+.level {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.level[disabled] { opacity: 0.5; cursor: default; }
+.level .emoji { font-size: 27px; line-height: 1; flex-shrink: 0; }
+.level .body { flex: 1; min-width: 0; }
+.level .name { font-weight: 650; font-size: 16px; }
+.level .tag { font-size: 13.5px; color: var(--text-dim); }
+
+.dots { display: flex; gap: 4px; margin-top: 7px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+.dot.on { background: var(--ok); }
+.done-badge { color: var(--ok); font-size: 19px; flex-shrink: 0; }
+
+/* ---------------------------------------------------------------- lessons */
+
+.progress-line {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.progress-line span {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.progress-line span.on { background: var(--accent); }
+
+/* ---------------------------------------------------------------- editor */
+
+.editor-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--code-bg);
+  margin: 12px 0;
+}
+
+#code {
+  display: block;
+  width: 100%;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  background: var(--code-bg);
+  color: var(--code-text);
+  /* 16px keeps iOS from zooming the page when the editor takes focus. */
+  font: 16px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding: 12px 14px;
+  min-height: 190px;
+  tab-size: 4;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+
+/* ------------------------------------------------------------ key toolbar */
+
+#keybar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  gap: 6px;
+  padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+#keybar::-webkit-scrollbar { display: none; }
+
+#keybar button {
+  flex: 0 0 auto;
+  min-width: 40px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#keybar button:active { background: var(--accent-soft); }
+#keybar button.wide { min-width: 52px; font-size: 14px; }
+
+/* ----------------------------------------------------------------- tests */
+
+.result {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 14.5px;
+  background: var(--bad-soft);
+}
+
+.result.pass { background: var(--ok-soft); }
+.result .mark { font-weight: 700; flex-shrink: 0; }
+.result.pass .mark { color: var(--ok); }
+.result:not(.pass) .mark { color: var(--bad); }
+.result .detail { min-width: 0; flex: 1; }
+
+.result .cmp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  margin-top: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-box {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 12px 0;
+}
+
+.banner {
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 12px 0;
+  font-weight: 600;
+}
+
+.banner.win { background: var(--ok-soft); color: var(--ok); }
+
+/* ------------------------------------------------------------------ hints */
+
+.hint {
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  font-size: 14.5px;
+}
+
+.hint pre { margin: 8px 0 0; }
+
+details.help {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+
+details.help summary {
+  cursor: pointer;
+  font-weight: 650;
+  min-height: 24px;
+  list-style: none;
+}
+
+details.help summary::-webkit-details-marker { display: none; }
+details.help summary::before { content: "▸ "; color: var(--accent); }
+details.help[open] summary::before { content: "▾ "; }
+
+.help-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+.help-table td { padding: 5px 0; vertical-align: top; border-top: 1px solid var(--border); }
+.help-table td:first-child {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding-right: 12px;
+  white-space: nowrap;
+  color: var(--accent);
+}
+.help-table tr:first-child td { border-top: 0; }
+
+/* --------------------------------------------------------------------- qa */
+
+.choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 13px 15px;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.choice.correct { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.choice.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choice[disabled] { cursor: default; }
+
+/* ------------------------------------------------------------------ misc */
+
+.stat-row { display: flex; gap: 10px; margin: 14px 0; }
+
+.stat {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+
+.stat .n { font-size: 22px; font-weight: 700; }
+.stat .l { font-size: 12px; color: var(--text-dim); }
+
+.spacer { height: 68px; }

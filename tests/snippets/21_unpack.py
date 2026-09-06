@@ -1,0 +1,10 @@
+a, b = [1, 2]
+print(a, b)
+x, y = 1, 2
+x, y = y, x
+print(x, y)
+p, q, r = (1, 2, 3)
+print(p, q, r)
+a, b = "hi"
+print(a, b)
+one, two = [1, 2, 3]
