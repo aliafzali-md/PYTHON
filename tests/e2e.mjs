@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LEVELS } from '../docs/js/curriculum.js';
 
 const DOCS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../docs');
 const TYPES = {
@@ -186,6 +187,64 @@ await editor.fill('if True:');
 await editor.press('End');
 await editor.press('Enter');
 check('Enter auto-indents after a colon', await editor.inputValue() === 'if True:\n    ');
+
+// --- the whole course, start to finish -------------------------------------
+// Every level, driven by its own solutions, in a fresh browser profile. This is
+// the only check that proves the later levels are reachable and completable.
+const fresh = await browser.newContext(devices['iPhone 13']);
+const run = await fresh.newPage();
+const playErrors = [];
+run.on('pageerror', (err) => playErrors.push(err.message));
+await run.goto(base, { waitUntil: 'networkidle' });
+
+for (let index = 0; index < LEVELS.length; index++) {
+  const level = LEVELS[index];
+  const card = run.locator('.level').nth(index);
+
+  if (!(await card.isEnabled())) {
+    check(`level ${index + 1} (${level.title}) is reachable`, false);
+    break;
+  }
+  await card.click();
+
+  for (let c = 0; c < level.lesson.length - 1; c++) {
+    await run.locator('button:has-text("Next")').first().click();
+  }
+  await run.locator('button:has-text("Start exercises")').click();
+
+  let solvedAll = true;
+  for (let e = 0; e < level.exercises.length; e++) {
+    const exercise = level.exercises[e];
+    await run.locator('#code').fill(exercise.solution);
+    await run.locator('button:has-text("Run tests")').click();
+    if (await run.locator('.banner.win').count() === 0) {
+      solvedAll = false;
+      const detail = await run.locator('.result:not(.pass), .error-box').first().innerText()
+        .catch(() => 'no detail');
+      console.log(`     ${level.id}/${exercise.id} did not pass in the browser: ${detail}`);
+      break;
+    }
+    await run.locator('button:has-text("Next exercise"), button:has-text("Review questions")')
+      .first().click();
+  }
+  check(`level ${index + 1} (${level.title}): all ${level.exercises.length} exercises solvable`, solvedAll);
+  if (!solvedAll) break;
+
+  for (let q = 0; q < level.qa.length; q++) {
+    await run.locator('.choice').nth(level.qa[q].answer).click();
+    await run.locator('button:has-text("Next question"), button:has-text("Finish level")')
+      .first().click();
+  }
+
+  check(`level ${index + 1} completes`, await run.locator('.banner.win').count() === 1);
+  await run.locator('button:has-text("Back to levels")').click();
+}
+
+const finalXp = await run.locator('#xp-chip').innerText();
+check(`the whole course can be finished (${finalXp})`,
+  await run.locator('.done-badge').count() === LEVELS.length);
+check('no errors during the full playthrough', playErrors.length === 0);
+if (playErrors.length) console.log(playErrors.slice(0, 5));
 
 check('no console errors', consoleErrors.length === 0);
 if (consoleErrors.length) console.log(consoleErrors.slice(0, 5));
